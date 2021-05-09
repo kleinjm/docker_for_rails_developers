@@ -1,4 +1,5 @@
 FROM ruby:2.7.2
+LABEL maintainer="kleinjm007@gmail.com"
 
 RUN apt-get update -yqq && \
     apt-get install -yqq --no-install-recommends \
