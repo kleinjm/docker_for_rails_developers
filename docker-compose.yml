@@ -1,11 +1,26 @@
-version: "3"
+version: "3" # docker-compose version. Needs to be compatible with Docker version. See https://docs.docker.com/compose/compose-file/compose-versioning/
 
-services:
-  web:
-    build: .
+services: # parts of our application
+
+  web: # a service
+    build: . # where to find the Dockerfile. Relative to this compose file
     ports:
-      - "3000:3000"
+      - "3000:3000" # map the container’s port 3000 to port 3000 on our local machine
     volumes:
-      - .:/usr/src/app
+      - .:/usr/src/app # map the host's PWD (. dir relative to compose file) to the container's app dir. This allow two way file syncing
+    env_file: # where to find environment variables
+      - .env/development/database
+      - .env/development/web
+
   redis:
-    image: redis
+    image: redis # official image to use when not using a custom Dockerfile built image
+
+  database:
+    image: postgres
+    env_file:
+      - .env/development/database
+    volumes: # tell compose to mount the listed volumes
+      - db_data:/var/lib/postgresql/data # named volume : directory to persist in this container
+
+volumes: # declare the named volumes
+  db_data:
