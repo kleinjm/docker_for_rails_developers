@@ -1,19 +1,30 @@
 FROM ruby:2.7.2
 LABEL maintainer="kleinjm007@gmail.com"
 
-RUN apt-get update -yqq && \
-    apt-get install -yqq --no-install-recommends \
-    nodejs
+# Allow apt to work with https-based sources
+RUN apt-get update -yqq && apt-get install -yqq --no-install-recommends \
+    apt-transport-https
 
+# Ensure we install an up-to-date version of Node
+# See https://github.com/yarnpkg/yarn/issues/2888
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
+
+# Ensure latest packages for Yarn
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-RUN apt update && apt install yarn
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | \
+  tee /etc/apt/sources.list.d/yarn.list
 
+# Install packages
+RUN apt-get update -yqq && apt-get install -yqq --no-install-recommends \
+  nodejs \
+  yarn
+
+# Copy the Gemfile and Gemfile.lock first to cache the gem list and prevent
+# re-bundling
 COPY Gemfile* /usr/src/app/
+# Set the working directory inside the docker container
 WORKDIR /usr/src/app
-
 RUN bundle install
-RUN rails webpacker:install
 
 COPY . /usr/src/app/
 
