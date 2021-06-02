@@ -24,8 +24,14 @@ RUN apt-get update -yqq && apt-get install -yqq --no-install-recommends \
 COPY Gemfile* /usr/src/app/
 # Set the working directory inside the docker container
 WORKDIR /usr/src/app
+# Set BUNDLE_PATH env var to value `/gem`
+ENV BUNDLE_PATH /gem
 RUN bundle install
 
+# Sync the pwd from the host to the app directory in the Docker container
 COPY . /usr/src/app/
 
+# ENTRYPOINT is a command to prepend to the CMD run upon starting a new container
+ENTRYPOINT ["./docker-entrypoint.sh"]
+# The command to run when strating the container
 CMD ["bin/rails", "s", "-b", "0.0.0.0"]

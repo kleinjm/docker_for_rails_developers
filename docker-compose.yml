@@ -9,6 +9,7 @@ services: # parts of our application
       - "4000:4000" # expose port 4000 for the selenium container
     volumes:
       - .:/usr/src/app # map the host's PWD (. dir relative to compose file) to the container's app dir. This allow two way file syncing
+      - gem_cache:/gems # map the gem_cache volume to the /gems directory in the container
     env_file: # where to find environment variables
       - .env/development/database
       - .env/development/web
@@ -22,6 +23,7 @@ services: # parts of our application
       - 3035:3035
     volumes:
       - .:/usr/src/app
+      - gem_cache:/gems # map the gem_cache volume to the /gems directory in the container
     env_file:
       - .env/development/database
       - .env/development/web
@@ -47,3 +49,4 @@ services: # parts of our application
 
 volumes: # declare the named volumes
   db_data:
+  gem_cache:
